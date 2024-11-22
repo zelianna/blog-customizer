@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { ArrowButton } from 'src/ui/arrow-button';
 import { Button } from 'src/ui/button';
 import {Text} from 'src/ui/text';
@@ -12,9 +12,9 @@ import {
 	fontColors,
 	fontFamilyOptions,
 	fontSizeOptions,
-	OptionType,
 	ArticleStateType
 } from 'src/constants/articleProps';
+import { useOutsideClickClose } from 'src/ui/select/hooks/useOutsideClickClose';
 
 
 import styles from './ArticleParamsForm.module.scss';
@@ -23,27 +23,17 @@ export const ArticleParamsForm = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [formState, setFormState] = useState<ArticleStateType>({ ...defaultArticleState });
     
-	
 	const containerRef = useRef<HTMLDivElement | null>(null);
+	useOutsideClickClose({
+		isOpen, 
+		rootRef: containerRef, 
+		onChange: (newValue) => setIsOpen(newValue)
+	});
+
+
 	const toggleSidebar = () => {
 		setIsOpen((prev) => !prev);
 	};
-	const handleClickOutside = (event: MouseEvent) => {
-		if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-			setIsOpen(false);
-		}
-	};
-	useEffect(() => {
-		if (isOpen) {
-			document.addEventListener('mousedown', handleClickOutside);
-		} else {
-			document.removeEventListener('mousedown', handleClickOutside);
-		}
-		return () => {
-			document.removeEventListener('mousedown', handleClickOutside);
-		};
-	}, [isOpen]);
-
 
 	return (
 		<>
@@ -61,7 +51,7 @@ export const ArticleParamsForm = () => {
 					/>
 					<RadioGroup
 						title='Размер шрифта'
-						name=''
+						name='fontSize'
 						options={fontSizeOptions}
 						selected={formState.fontSizeOption}
                     />
